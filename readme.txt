@@ -14,7 +14,7 @@ License: GPLv2
 
 This plugin is an addon for WooCommerce to implement a payment gateway method for accepting **Credit Cards Payments** By merchants through **Merchant One Payment Gateway via Authorize.Net Emulation** Gateway
 
-This plugin uses AIM and Uses CURL to pass data to payment gateway and hence named as ** Merchant One Payment Gateway via  Authorize.Net Emulation**
+This plugin uses AIM and Uses CURL to pass data to payment gateway and hence named as **Merchant One Payment Gateway via  Authorize.Net Emulation**
 
 
 = Features =

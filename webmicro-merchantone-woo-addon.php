@@ -53,9 +53,7 @@ function merchantone_init()
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) ); 		 }
 
 		}
-		
-		
-		
+			
 		public function admin_options()
 		{
 		?>
@@ -66,7 +64,6 @@ function merchantone_init()
 		</table>
 		<?php
 		}
-		
 		
 		
 		public function init_form_fields()
@@ -234,8 +231,6 @@ function merchantone_init()
 			return $merchantone_args ; 
 		}
 
-		
-		
 		
 		
 		
