@@ -28,11 +28,14 @@ function merchantone_init()
 		{
 
 		$this->id               = 'merchantonegateway';
-		$this->icon             = apply_filters( 'woocommerce_merchantone_icon', plugins_url( 'images/merchantone.png' , __FILE__ ) );
+		$this->icon             = plugins_url( 'images/merchantone.png' , __FILE__ )  ;
 		$this->has_fields       = true;
 		$this->method_title     = 'Merchant One Cards Settings';		
 		$this->init_form_fields();
 		$this->init_settings();
+
+		$this->supports                 = array( 'default_credit_card_form','products');
+
 		$this->title			          = $this->get_option( 'merchantone_title' );
 		$this->merchantone_apilogin        = $this->get_option( 'merchantone_apilogin' );
 		$this->merchantone_transactionkey  = $this->get_option( 'merchantone_transactionkey' );
@@ -53,7 +56,9 @@ function merchantone_init()
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) ); 		 }
 
 		}
-			
+		
+		
+		
 		public function admin_options()
 		{
 		?>
@@ -64,6 +69,7 @@ function merchantone_init()
 		</table>
 		<?php
 		}
+		
 		
 		
 		public function init_form_fields()
@@ -125,6 +131,36 @@ function merchantone_init()
 			),
 	  	);
   		}
+
+
+  		public function get_icon() {
+		$icon = '';
+		if(is_array($this->merchantone_cardtypes ))
+		{
+        foreach ($this->merchantone_cardtypes as $card_type ) {
+
+			if ( $url = $this->get_payment_method_image_url( $card_type ) ) {
+				
+				$icon .= '<img src="' . esc_url( $url ) . '" alt="' . esc_attr( strtolower( $card_type ) ) . '" />';
+			}
+		  }
+		}
+		else
+		{
+			$icon .= '<img src="' . esc_url( plugins_url( 'images/merchantone.png' , __FILE__ ) ).'" alt="Mercant One Gateway" />';	  
+		}
+
+         return apply_filters( 'woocommerce_merchantone_icon', $icon, $this->id );
+		}
+      
+		public function get_payment_method_image_url( $type ) {
+
+		$image_type = strtolower( $type );
+
+			return  WC_HTTPS::force_https_url( plugins_url( 'images/' . $image_type . '.png' , __FILE__ ) ); 
+		}
+
+
 				
 		/*Get Card Types*/
 		function get_card_type($number)
@@ -156,7 +192,7 @@ function merchantone_init()
 		    }
 		    else
 		    {
-		        return 'unknown';
+		        return 'Invalid Card No';
 		    }
 		}// End of getcard type function
 		
@@ -186,15 +222,23 @@ function merchantone_init()
 
 		public function merchantone_params($wc_order) {
 
+			$exp_date         = explode( "/", sanitize_text_field($_POST['merchantonegateway-card-expiry']));
+			$exp_month        = str_replace( ' ', '', $exp_date[0]);
+			$exp_year         = str_replace( ' ', '',$exp_date[1]);
+
+			if (strlen($exp_year) == 2) {
+			$exp_year += 2000;
+			}
+
 			$merchantone_args = array(
 			// Login Information
 			'username'  		=> $this->merchantone_apilogin,
 			'password'  		=> $this->merchantone_transactionkey,
 			// Sales Information
-			'ccnumber'  		=> sanitize_text_field($_POST['merchantone_cardno']),
-			'ccexp'     		=> sanitize_text_field($_POST['merchantone_expmonth' ]).sanitize_text_field($_POST['merchantone_expyear' ]) ,
+			'ccnumber'  		=> sanitize_text_field(str_replace(" ", "",$_POST['merchantonegateway-card-number']) ),
+			'ccexp'     		=> $exp_month.$exp_year ,
 			'amount'    		=> number_format($wc_order->order_total,2,".",""),
-			'cvv'       		=> sanitize_text_field($_POST['merchantone_cardcvv']) ,
+			'cvv'       		=> sanitize_text_field($_POST['merchantonegateway-card-cvc']) ,
 			// Order Information
 			'ipaddress' 		=> $this->get_client_ip(),
 			'orderid'   		=> $wc_order->get_order_number() ,
@@ -234,52 +278,6 @@ function merchantone_init()
 		
 		
 		
-		/*Start of payment functions field*/
-		public function payment_fields()
-		{	
-		?>
-		<table>
-		    <tr>
-		    	<td><label for="merchantone_cardno"><?php echo __( 'Card No.', 'woocommerce') ?></label></td>
-			<td><input type="text" name="merchantone_cardno" class="input-text" placeholder="Credit Card No"  /></td>
-		    </tr>
-		    <tr>
-		    	<td><label for="merchantone_expiration_date"><?php echo __( 'Expiration Date', 'woocommerce') ?>.</label></td>
-			<td>
-			   <select name="merchantone_expmonth">
-			      <option value=""><?php _e( 'Month', 'woocommerce' ) ?></option>
-			      <option value='01'>01</option>
-			      <option value='02'>02</option>
-			      <option value='03'>03</option>
-			      <option value='04'>04</option>
-			      <option value='05'>05</option>
-			      <option value='06'>06</option>
-			      <option value='07'>07</option>
-			      <option value='08'>08</option>
-			      <option value='09'>09</option>
-			      <option value='10'>10</option>
-			      <option value='11'>11</option>
-			      <option value='12'>12</option>  
-			    </select>
-			    <select name="merchantone_expyear">
-			      <option value=""><?php _e( 'Year', 'woocommerce' ) ?></option>
-			      <?php
-			      $years = array();
-			      for ( $i = date( 'y' ); $i <= date( 'y' ) + 15; $i ++ ) 
-			      {
-					printf( '<option value="20%u">20%u</option>', $i, $i );
-			      } 
-			      ?>
-			    </select>
-			</td>
-		    </tr>
-		    <tr>
-		    	<td><label for="merchantone_cardcvv"><?php echo __( 'Card CVC', 'woocommerce') ?></label></td>
-			<td><input type="text" name="merchantone_cardcvv" class="input-text" placeholder="CVC" /></td>
-		    </tr>
-		</table>
-	        <?php  
-		} // end of public function payment_fields()
 		
 		/*Payment Processing Fields*/
 		public function process_payment($order_id)
@@ -288,7 +286,7 @@ function merchantone_init()
 			global $woocommerce;
          		$wc_order = new WC_Order($order_id);
          		
-			$cardtype = $this->get_card_type(sanitize_text_field($_POST['merchantone_cardno']));
+			$cardtype = $this->get_card_type( sanitize_text_field(str_replace(" ", "",$_POST['merchantonegateway-card-number']) ) );
 			
          		if(!in_array($cardtype ,$this->merchantone_cardtypes ))
          		{
@@ -328,11 +326,10 @@ function merchantone_init()
 			curl_setopt($ch, CURLOPT_POST, 1);
 
 			if (!($data = curl_exec($ch))) {
-				return ERROR;
+				throw new Exception( __( 'Empty Merchant One Gateway response.','woocommerce') );;
 			}
 			curl_close($ch);
 			unset($ch);
-			
 			
  			$data = explode("&",$data);
  			
@@ -343,7 +340,6 @@ function merchantone_init()
 				
 			}
  			
-
 
 		if ( count($response_array) > 1 )
 		{
