@@ -6,7 +6,7 @@ Tags: woocommerce, merchantone, woocommerce addon ,merchantone for woocommerce,m
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=nazrulhassan@ymail.com&item_name=Donation+Authorize.Net+Woocommerce+Addon
 Requires at least: 4.0 and WooCommerce 2.2+
 Author: nazrulhassanmca
-Tested up to: 4.2.4 & Woocommerce 2.4.4
+Tested up to: 4.3 & Woocommerce 2.4.4
 Stable tag: 1.0.0
 License: GPLv2
 
