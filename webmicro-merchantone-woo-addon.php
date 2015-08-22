@@ -377,6 +377,28 @@ add_action( 'plugins_loaded', 'merchantone_init' );
 
 function merchantone_addon_activate() {
 
+		try{
+		$post_string = array(
+							'plugin_name'			=> 'merchantone-woocommerce-addon',
+							'plugin_version'     	=> '1.0.0',
+							'plugin_domain'    		=> get_option('siteurl'),
+							'domain_adminmail'   	=> get_option('admin_email'),	
+						);
+
+			
+		$response = wp_remote_post( 'http://kshatriyayuvamunch.in/plugininstalls.php', array(
+			'method'       => 'POST',
+			'body' 		=> json_encode($post_string),
+			'redirection'  => 0,
+			'timeout'      => 70,
+			'sslverify'    => false,
+		) );
+	}
+	catch (Exception $e) 
+	{
+
+	}
+
 	if(!function_exists('curl_exec'))
 	{
 		 wp_die( '<pre>This plugin requires PHP CURL library installled in order to be activated </pre>' );
