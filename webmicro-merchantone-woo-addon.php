@@ -405,3 +405,12 @@ function merchantone_addon_activate() {
 	}
 }
 register_activation_hook( __FILE__, 'merchantone_addon_activate' );
+
+/*Plugin Settings Link*/
+function merchantone_settings_link( $links ) {
+    $settings_link = '<a href="admin.php?page=wc-settings&tab=checkout&section=wc_merchantone_gateway">' . __( 'Settings' ) . '</a>';
+    array_push( $links, $settings_link );
+  	return $links;
+}
+$plugin = plugin_basename( __FILE__ );
+add_filter( "plugin_action_links_$plugin", 'merchantone_settings_link' );

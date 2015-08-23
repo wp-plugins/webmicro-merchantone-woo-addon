@@ -26,7 +26,7 @@ This plugin uses AIM and Uses CURL to pass data to payment gateway and hence nam
 6. Can work with sandbox/live Merchant One Payment Gateway accounts for testing purpose.
 7. This plugin currently **Supports accepting in USD**.
 8. This plugin does not store **Credit Card Details**.
-9. Feature to accept the type of card you like.
+9. Feature to accept the type of card you like with dynamic card logo at checkout.
 10. This plugin works as authorize and capture (sale) by default.
 
 
